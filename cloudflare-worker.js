@@ -90,11 +90,11 @@ async function streamJsonResponseBodies(response, writable) {
       break;
     }
     const currentText = decoder.decode(value, { stream: true }); // stream: true is important here,fix the bug of incomplete line
-    if (currentText.startsWith('event: ping')) {
-      continue;
-    }
-    const sanitizedText = currentText.replace('event: completion', '').trim();
+    buffer += currentText.replace(/event: (completion|ping)\s*|\r/gi,'');
+    const substr = buffer.split('\n\n'), lastMsg = substr.length - 1;
+    0 !== substr[lastMsg].length ? buffer = substr[lastMsg] : buffer = '';
     // if meet new line, then write the buffer to the writer
+    for (let i = 0; i < lastMsg; i++) {
     if (buffer.startsWith('data: ') && buffer.endsWith('}')) {
       try {
         const decodedLine = JSON.parse(buffer.slice(5));
