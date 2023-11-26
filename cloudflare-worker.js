@@ -95,7 +95,6 @@ async function streamJsonResponseBodies(response, writable) {
     0 !== substr[lastMsg].length ? buffer = substr[lastMsg] : buffer = '';
     // if meet new line, then write the buffer to the writer
     for (let i = 0; i < lastMsg; i++) {
-    if (buffer.startsWith('data: ') && buffer.endsWith('}')) {
       try {
         const decodedLine = JSON.parse(buffer.slice(5));
         const completion = decodedLine['completion'];
@@ -124,9 +123,7 @@ async function streamJsonResponseBodies(response, writable) {
         buffer = '';
       } catch (e) {}
     }
-    buffer += sanitizedText;
   }
-
   await writer.close();
 }
 
